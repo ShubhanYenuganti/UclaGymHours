@@ -4,6 +4,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 headers = {
     'Accept': '*/*',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -21,7 +23,7 @@ headers = {
 }
 
 params = {
-    'AccountAPIKey': '73829a91-48cb-4b7b-bd0b-8cf4134c04cd',
+    'AccountAPIKey': os.getenv("API_KEY"),
 }
 
 response = requests.get(
