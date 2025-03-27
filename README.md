@@ -1,4 +1,15 @@
-Extension of my CS35L Bruin Active project that now attempts to visualize UCLA gym occupancies on an hour-to-hour basis.
-Currently developed the backend that quickly pulls occupancy data from Ucla Rec with BeautifulSoup, stores into MongoDB server and uses Flask for the API.
-Next goal is to develop a React frontend that visualizes occupancy of Bfit and Wooden by each hour and then test locally with pulled data on an hour-to-hour basis.
-Then deploy it with AWS lambda that automatically runs backend every hour to dynamically load new occupancy data.
+# Ucla Gym Occupancy
+
+An extension of my Bruin Active CS35L project that now attempts to dynamically collect occupancy data on an hour to hour basis and display this in real-time.
+
+## To Use Backend
+From the directory of app.py
+```shell
+pip install flask flask-cors pymongo python-dotenv
+python app.py
+```
+It should display the latest entry of occupancy data displayed in the mongodb cluster in json.
+
+## Future Goals
+Implement a frontend and test it locally by logging occupancy data into mongodb within my machine.
+Afterwards deploy it into AWS to run the backend and hour-by-hour basis automatically.
