@@ -11,5 +11,5 @@ python app.py
 It should display the latest entry of occupancy data displayed in the mongodb cluster in json.
 
 ## Future Goals
-Implement a frontend and test it locally by logging occupancy data into mongodb within my machine.
+Implement a frontend and then test the app locally by running the script that logs occupancy data into mongodb manually per hour.
 Afterwards deploy it into AWS to run the backend and hour-by-hour basis automatically.
