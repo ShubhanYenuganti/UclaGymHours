@@ -1,31 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ gym }} Occupancy by Hour</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; }
-        table { border-collapse: collapse; width: 50%; }
-        th, td { padding: 0.5rem; border: 1px solid #ccc; text-align: center; }
-        th { background-color: #f0f0f0; }
-    </style>
+    <title>{{ gym }} occupancy by hour</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='hourly.css') }}">
 </head>
 <body>
-    <h1>{{ gym }} – Hourly Occupancy</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Hour</th>
-                <th>Occupancy %</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for hour, percent in data.items() %}
-            <tr>
-                <td>{{ hour }}</td>
-                <td>{{ percent }}%</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <header>
+        <div class="header">
+            <h1>
+                {% if gym == "Wooden" %}
+                    John Wooden Center
+                {% elif gym == "BFit" %}
+                    Bruin Fitness Center
+                {% endif %}
+              </h1>
+            <div class="header-right">
+                <a href="/">Home</a>
+                <a href="/wooden" class="{% if gym == 'Wooden' %}active{% endif %}">Wooden</a>
+                <a href="/bfit" class="{% if gym == 'BFit' %}active{% endif %}">BFit</a>
+            </div>
+        </div>
+    </header>
 </body>
 </html>

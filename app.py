@@ -14,6 +14,15 @@ db = client["UclaGym"]
 collection = db["gym-occupancy"]
 doc_id = ObjectId("67e73b40070de1e22fd7463e")
 
+
+@app.route('/')
+def rootpage():
+    # doc = collection.find_one({"_id": doc_id})
+    # doc["_id"] = str(doc["_id"])
+    # return jsonify(doc)
+
+    return render_template("home.html")
+
 @app.route('/wooden')
 def wooden_page():
     cursor = collection.find({"_id": {"$ne": doc_id}}).sort("timestamp", -1)
@@ -38,13 +47,6 @@ def bfit_page():
     hourly_percentages = parse_hourly_percentages(bfit_data_list)
     return render_template("hourly.html", gym="BFit", data=hourly_percentages)
 
-
-@app.route('/data')
-def data_page():
-    doc = collection.find_one({"_id": doc_id})
-    doc["_id"] = str(doc["_id"])
-    return jsonify(doc)
-
 def parse_hourly_percentages(data):
     hourly = {}
     for entry in data:
@@ -54,7 +56,7 @@ def parse_hourly_percentages(data):
         if not added_date or percentage is None:
             continue
 
-        dt = added_date 
+        dt = added_date
         hour_key = f"{dt.hour:02d}:00:00"
         hourly[hour_key] = percentage
 
