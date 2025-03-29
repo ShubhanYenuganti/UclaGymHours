@@ -64,6 +64,12 @@ def load_data():
                 "percentage": percentage
             }
 
+            wooden["all_zones"] = {
+                "count": helper_overall_occupancy(wooden)["count"],
+                "capacity": helper_overall_occupancy(wooden)["capacity"],
+                "percentage": helper_overall_occupancy(wooden)["percentage"]
+            }
+
         if entry["FacilityName"] == "Bruin Fitness Center - FITWELL":
             dt = datetime.fromisoformat(entry["LastUpdatedDateAndTime"])
             formatted_date = dt.strftime("%m/%d/%Y")
@@ -86,12 +92,18 @@ def load_data():
                 "count": count,
                 "percentage": percentage,
             }
+
+            bfit["all_zones"] = {
+                "count": helper_overall_occupancy(bfit)["count"],
+                "capacity": helper_overall_occupancy(bfit)["capacity"],
+                "percentage": helper_overall_occupancy(bfit)["percentage"]
+            }
     
     return [wooden, bfit]
 
 def update_cell(gym_data):
     MONGO_URI = os.getenv("MONGODB_URI")
-    print("Connecting to:", MONGO_URI)
+    print("Connecting to:")
     client = MongoClient(MONGO_URI)
     db = client["UclaGym"]
     collection = db["gym-occupancy"]
@@ -113,10 +125,10 @@ def update_cell(gym_data):
     bfit_entries = doc["wooden"][bfit_day][bfit_time]["entries"]
     bfit_prev_occupancy = doc["wooden"][bfit_day][bfit_time]["occupancy"]
 
-    wooden_new_occupancy = (wooden_prev_occupancy * wooden_entries + helper_overall_occupancy(gym_data[0])) / (wooden_entries + 1)
+    wooden_new_occupancy = ((wooden_prev_occupancy * wooden_entries) + gym_data[0]["all_zones"]["percentage"]) / (wooden_entries + 1)
     wooden_new_occupancy = round(wooden_new_occupancy, 2)
 
-    bfit_new_occupancy = (bfit_prev_occupancy * bfit_entries + helper_overall_occupancy(gym_data[1])) / (bfit_entries + 1)
+    bfit_new_occupancy = ((bfit_prev_occupancy * bfit_entries) + gym_data[1]["all_zones"]["percentage"]) / (bfit_entries + 1)
     bfit_new_occupancy = round(bfit_new_occupancy, 2)
 
     wooden_entries_path = f"{"wooden"}.{wooden_day}.{wooden_time}.entries"
@@ -137,7 +149,7 @@ def update_cell(gym_data):
 
 def add_hour(gym_data):
     MONGO_URI = os.getenv("MONGODB_URI")
-    print("Connecting to:", MONGO_URI)
+    print("Connecting to:")
     client = MongoClient(MONGO_URI)
     db = client["UclaGym"]
     collection = db["gym-occupancy"]
@@ -172,7 +184,7 @@ def helper_overall_occupancy(gym):
 
     for zone_name, data in gym.items():
         if data.get("closed"):
-            continue  # Skip closed zones
+            continue 
 
         count = data.get("count", 0)
         capacity = data.get("capacity", 0)
@@ -185,7 +197,11 @@ def helper_overall_occupancy(gym):
     else:
         overall_percentage = round((total_count / total_capacity) * 100, 2)
 
-    return overall_percentage
+    return {
+        "count": total_count,
+        "capacity": total_capacity,
+        "percentage": overall_percentage
+    }
 
 if __name__ == "__main__":
     res = load_data()
