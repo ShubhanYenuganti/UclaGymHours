@@ -3,6 +3,7 @@
     <head>
         <title>Home Page</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
 
     <body>
@@ -15,6 +16,123 @@
                 </div>
               </div>
         </header>
+
+        <div class="controls">
+            <form method="get" action="/">
+                <label>Gym:</label>
+                <select name="gym">
+                    <option value="wooden" {% if gym == 'wooden' %}selected{% endif %}>Wooden</option>
+                    <option value="bfit" {% if gym == 'bfit' %}selected{% endif %}>BFit</option>
+                </select>
+    
+                <label>Day:</label>
+                <select name="day">
+                    {% for d in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                        <option value="{{ d }}" {% if d == day %}selected{% endif %}>{{ d.capitalize() }}</option>
+                    {% endfor %}
+                </select>
+    
+                <button type="submit">Update</button>
+            </form>
+        </div>
+
+        <canvas id="occupancyChart"></canvas>
+
+        <script>
+            const ctx = document.getElementById('occupancyChart').getContext('2d');
+    
+            const labels = [
+                {% for hour in range(5, 24) %}
+                    "{{ (hour % 12 if hour % 12 != 0 else 12) }}:00 {{ 'AM' if hour < 12 else 'PM' }}",
+                {% endfor %}
+                {% for hour in range(0, 2) %}
+                    "{{ (hour % 12 if hour % 12 != 0 else 12) }}:00 AM",
+                {% endfor %}
+            ];
+    
+            const occupancyData = [
+                {% for hour in range(5, 24) %}
+                    {{ data.get('%02d:00:00' % hour, 0) }},
+                {% endfor %}
+                {% for hour in range(0, 2) %}
+                    {{ data.get('%02d:00:00' % hour, 0) }},
+                {% endfor %}
+            ];
+    
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: 
+                    [{
+                        type: 'bar',
+                        label: 'Occupancy (%)',
+                        data: occupancyData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        type: 'line',
+                        label: 'Trend',
+                        data: occupancyData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 2,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 0
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: value => value + "%"
+                            },
+                            title: {
+                                display: true,
+                                text: 'Occupancy (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(ctx) {
+                                    // Only show title (time) for bar dataset
+                                    if (ctx[0].dataset.type === 'line') {
+                                        return ''; 
+                                    }
+                                    return ctx[0].label;
+                                },
+                                label: function (ctx) {
+                                    // Only show tooltip for bar dataset
+                                    if (ctx.dataset.type === 'line') {
+                                        return null; // hide tooltip for the line
+                                    }
+                                    return ctx.raw + "%";
+                                }
+                            }
+                        },
+                        legend: {
+                            labels: {
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
     <body>
 
     
