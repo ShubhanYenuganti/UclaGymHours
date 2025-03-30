@@ -14,5 +14,4 @@ python app.py
 ```
 
 ## Future Goals
-Optimize the frontend for mobile use. 
-Afterwards deploy it into AWS to run the backend on an hour-by-hour basis automatically.
+In the near future I plan to validify the project by manually running pull.py to test the application. I then plan to deploy the backend as an AWS Lambda function that runs automatically and deploy the entire application into a hosting site for public use. 
