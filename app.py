@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from bson import ObjectId
+from datetime import datetime
 import os
 
 app = Flask(__name__)
@@ -18,10 +19,13 @@ doc_id = ObjectId("67e73b40070de1e22fd7463e")
 @app.route('/', methods=["GET"])
 def rootpage():
     gym = request.args.get("gym", "wooden")
-    day = request.args.get("day", "monday")
+    default_day = datetime.now().strftime("%A").lower()
+    day = request.args.get("day", default_day)
 
     doc = collection.find_one({"_id": doc_id})
     doc["_id"] = str(doc["_id"])
+
+
 
     return render_template("home.html", gym=gym, day=day, data = parse_helper(doc[gym][day]))
 
@@ -43,7 +47,6 @@ def wooden_page():
             wooden_data_list.append(doc["wooden"])
 
     hourly_percentages = parse_hourly_percentages(wooden_data_list)
-    print(hourly_percentages)
 
     return render_template("hourly.html", gym="Wooden", data=hourly_percentages)
 

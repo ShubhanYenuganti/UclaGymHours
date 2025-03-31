@@ -1,5 +1,4 @@
 requests
 pymongo
 python-dotenv
-bson
 pytz

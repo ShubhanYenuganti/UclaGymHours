@@ -64,10 +64,11 @@ def load_data():
                 "percentage": percentage
             }
 
+            overall = helper_overall_occupancy(wooden)
             wooden["all_zones"] = {
-                "count": helper_overall_occupancy(wooden)["count"],
-                "capacity": helper_overall_occupancy(wooden)["capacity"],
-                "percentage": helper_overall_occupancy(wooden)["percentage"]
+                "count": overall["count"],
+                "capacity": overall["capacity"],
+                "percentage": overall["percentage"]
             }
 
         if entry["FacilityName"] == "Bruin Fitness Center - FITWELL":
@@ -92,11 +93,13 @@ def load_data():
                 "count": count,
                 "percentage": percentage,
             }
+            
+            overall = helper_overall_occupancy(bfit)
 
             bfit["all_zones"] = {
-                "count": helper_overall_occupancy(bfit)["count"],
-                "capacity": helper_overall_occupancy(bfit)["capacity"],
-                "percentage": helper_overall_occupancy(bfit)["percentage"]
+                "count": overall["count"],
+                "capacity": overall["capacity"],
+                "percentage": overall["percentage"]
             }
     
     return [wooden, bfit]
@@ -122,8 +125,8 @@ def update_cell(gym_data):
     wooden_entries = doc["wooden"][wooden_day][wooden_time]["entries"]
     wooden_prev_occupancy = doc["wooden"][wooden_day][wooden_time]["occupancy"]
 
-    bfit_entries = doc["wooden"][bfit_day][bfit_time]["entries"]
-    bfit_prev_occupancy = doc["wooden"][bfit_day][bfit_time]["occupancy"]
+    bfit_entries = doc["bfit"][bfit_day][bfit_time]["entries"]
+    bfit_prev_occupancy = doc["bfit"][bfit_day][bfit_time]["occupancy"]
 
     wooden_new_occupancy = ((wooden_prev_occupancy * wooden_entries) + gym_data[0]["all_zones"]["percentage"]) / (wooden_entries + 1)
     wooden_new_occupancy = round(wooden_new_occupancy, 2)
@@ -146,6 +149,11 @@ def update_cell(gym_data):
                      bfit_occupancy_path: bfit_new_occupancy}
         }
     )
+
+    print("Wooden Added Time: " + wooden_time)
+    print("BFit Added Time: " + bfit_time)
+    print("Wooden Added Occupancy: " + wooden_new_occupancy)
+    print("BFit Added Occupancy: " + bfit_new_occupancy)
 
 def add_hour(gym_data):
     MONGO_URI = os.getenv("MONGODB_URI")
@@ -177,6 +185,8 @@ def add_hour(gym_data):
         doc,
         upsert=True
     )
+
+    print(doc)
 
 def helper_overall_occupancy(gym):
     total_count = 0
